@@ -1,7 +1,7 @@
 from gymnasium.wrappers import TimeLimit
 from env_hiv import HIVPatient
 import numpy as np
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import ExtraTreesRegressor
 from tqdm import tqdm
 from evaluate import evaluate_HIV, evaluate_HIV_population
 import pickle
@@ -34,7 +34,7 @@ class ProjectAgent:
 
     def load(self):
         # self.Qfunctions = np.load("Qfunctions.npy", allow_pickle=True)
-        self.Q = pickle.load(open("Q.pkl", "rb"))
+        self.Q = pickle.load(open("Q2.pkl", "rb"))
         
     
     def greedy_action(self,Q,s,nb_actions):
@@ -59,7 +59,7 @@ class ProjectAgent:
                     Q2[:,a2] = Qfunctions[-1].predict(S2A2)
                 max_Q2 = np.max(Q2,axis=1)
                 value = R + gamma*(1-D)*max_Q2
-            Q = RandomForestRegressor()
+            Q = ExtraTreesRegressor()
             Q.fit(SA,value)
             Qfunctions.append(Q)
         return Qfunctions[-1]
@@ -96,7 +96,7 @@ class ProjectAgent:
     
     def train(self):
         # Fitted Q-Iteration
-        horizon = 10000
+        horizon = 5000
         S, A, R, S2, D = self.collect_samples(env, horizon)
         nb_actions = env.action_space.n
         gamma = 0.99
@@ -108,7 +108,7 @@ class ProjectAgent:
 # agent.train()
 # # evaluate the agent
 # print(evaluate_HIV(agent=agent, nb_episode=1))
-# agent.save("Q.pkl")
+# agent.save("Q2.pkl")
 
 # agent2 = ProjectAgent()
 # agent2.load()
