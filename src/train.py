@@ -34,7 +34,7 @@ class ProjectAgent:
 
     def load(self):
         # self.Qfunctions = np.load("Qfunctions.npy", allow_pickle=True)
-        self.Q = pickle.load(open("Q2.pkl", "rb"))
+        self.Q = pickle.load(open("Q3.pkl", "rb"))
         
     
     def greedy_action(self,Q,s,nb_actions):
@@ -96,11 +96,11 @@ class ProjectAgent:
     
     def train(self):
         # Fitted Q-Iteration
-        horizon = 5000
+        horizon = 6000
         S, A, R, S2, D = self.collect_samples(env, horizon)
         nb_actions = env.action_space.n
         gamma = 0.99
-        iterations = 200
+        iterations = 500
         self.Q = self.rf_fqi(S, A, R, S2, D, iterations, nb_actions, gamma)
         
         
@@ -108,7 +108,7 @@ class ProjectAgent:
 # agent.train()
 # # evaluate the agent
 # print(evaluate_HIV(agent=agent, nb_episode=1))
-# agent.save("Q2.pkl")
+# agent.save("Q3.pkl")
 
 # agent2 = ProjectAgent()
 # agent2.load()
