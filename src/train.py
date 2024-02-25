@@ -50,6 +50,8 @@ DQN = torch.nn.Sequential(nn.Linear(state_dim, nb_neurons),
                           nn.ReLU(), 
                           nn.Linear(nb_neurons, nb_neurons),
                           nn.ReLU(), 
+                          nn.Linear(nb_neurons, nb_neurons),
+                          nn.ReLU(), 
                           nn.Linear(nb_neurons, n_action)).to(device)
 
 # DQN config
@@ -63,7 +65,7 @@ config = {'nb_actions': env.action_space.n,
           'epsilon_delay_decay': 500,
           'batch_size': 200,
           'gradient_steps': 4,
-          'update_target_strategy': 'replace', # or 'ema'
+          'update_target_strategy': 'replace',
           'update_target_freq': 500,
           'update_target_tau': 0.005,
           'criterion': torch.nn.SmoothL1Loss()} 
@@ -211,7 +213,7 @@ class ProjectAgent:
                 episode_cum_reward = 0
                 if score > best_score:
                     best_score = score
-                    self.save("DQN_MC.pt")
+                    self.save("DQN_MC_2.pt")
                     print("Best score, model saved")
             else:
                 state = next_state
@@ -229,7 +231,7 @@ class ProjectAgent:
         torch.save(self.model.state_dict(), path)
 
     def load(self):
-        self.model.load_state_dict(torch.load("DQN_MC.pt"))
+        self.model.load_state_dict(torch.load("DQN_MC_2.pt"))
 
 # agent = ProjectAgent()
 # print(agent.device)
