@@ -6,6 +6,18 @@ import random
 from gymnasium.wrappers import TimeLimit
 from env_hiv import HIVPatient
 from evaluate import evaluate_HIV, evaluate_HIV_population
+import os
+
+
+def seed_everything(seed: int = 42):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.cuda.manual_seed_all(seed)
 
 env = TimeLimit(
     env=HIVPatient(domain_randomization=False), max_episode_steps=200
@@ -50,13 +62,11 @@ DQN = torch.nn.Sequential(nn.Linear(state_dim, nb_neurons),
                           nn.ReLU(), 
                           nn.Linear(nb_neurons, nb_neurons),
                           nn.ReLU(), 
-                          nn.Linear(nb_neurons, nb_neurons),
-                          nn.ReLU(), 
                           nn.Linear(nb_neurons, n_action)).to(device)
 
 # DQN config
 config = {'nb_actions': env.action_space.n,
-          'learning_rate': 0.001,
+          'learning_rate': 0.01,
           'gamma': 0.99,
           'buffer_size': 100000,
           'epsilon_min': 0.01,
@@ -64,7 +74,7 @@ config = {'nb_actions': env.action_space.n,
           'epsilon_decay_period': 20000,
           'epsilon_delay_decay': 500,
           'batch_size': 200,
-          'gradient_steps': 4,
+          'gradient_steps': 2,
           'update_target_strategy': 'replace',
           'update_target_freq': 500,
           'update_target_tau': 0.005,
@@ -213,7 +223,7 @@ class ProjectAgent:
                 episode_cum_reward = 0
                 if score > best_score:
                     best_score = score
-                    self.save("DQN_MC_2.pt")
+                    self.save("DQN_MC_3.pt")
                     print("Best score, model saved")
             else:
                 state = next_state
@@ -231,14 +241,16 @@ class ProjectAgent:
         torch.save(self.model.state_dict(), path)
 
     def load(self):
-        self.model.load_state_dict(torch.load("DQN_MC_2.pt"))
+        self.model.load_state_dict(torch.load("DQN_MC_3.pt"))
 
 # agent = ProjectAgent()
 # print(agent.device)
 # episode_return, MC_avg_discounted_reward, MC_avg_total_reward, V_init_state = agent.train(env, 400)
+# seed_everything(seed=42)
 # agent = ProjectAgent()
 # agent.load()
 # print(evaluate_HIV(agent=agent, nb_episode=1))
+# print(evaluate_HIV_population(agent=agent, nb_episode=15))
 
 
 ### OLD CODE ####
